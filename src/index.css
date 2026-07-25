@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Optimus Princeps';
+  src: url('/assets/OptimusPrinceps.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Optimus Princeps';
+  src: url('/assets/OptimusPrincepsSemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@layer utilities {
+  .font-optimus {
+    font-family: 'Optimus Princeps', 'Cinzel', serif;
+  }
+  .font-cinzel {
+    font-family: 'Optimus Princeps', 'Cinzel', serif;
+  }
+  .font-cinzel-decorative {
+    font-family: 'Optimus Princeps', 'Cinzel Decorative', serif;
+  }
+  .font-cormorant {
+    font-family: 'Cormorant Garamond', serif;
+  }
+}
+
+@keyframes pulseEmber {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(220, 120, 40, 0.4), 0 0 16px rgba(200, 80, 20, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(240, 160, 50, 0.8), 0 0 28px rgba(220, 90, 30, 0.5);
+    transform: scale(1.15);
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 6px rgba(240, 140, 40, 0.6)); }
+  25% { opacity: 1; filter: drop-shadow(0 0 12px rgba(255, 170, 60, 0.9)); }
+  50% { opacity: 0.75; filter: drop-shadow(0 0 5px rgba(210, 100, 30, 0.5)); }
+  75% { opacity: 0.95; filter: drop-shadow(0 0 10px rgba(240, 150, 50, 0.8)); }
+}
+
+@keyframes slowGlow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+.animate-ember-pulse {
+  animation: pulseEmber 3s infinite ease-in-out;
+}
+
+.animate-flame-flicker {
+  animation: flameFlicker 2.5s infinite ease-in-out;
+}
+
+.animate-slow-glow {
+  animation: slowGlow 4s infinite ease-in-out;
+}
+
+/* Custom dark scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0e12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2824;
+  border-radius: 2px;
+  border: 1px solid #3d372e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c88828;
+}
+
+/* Custom selection */
+::selection {
+  background-color: rgba(200, 136, 40, 0.25);
+  color: #f5e4bc;
+}

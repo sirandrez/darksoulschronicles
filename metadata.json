@@ -1,0 +1,6 @@
+{
+  "name": "darksoulsChronicle",
+  "description": "Mural cronológico semi-interativo e minimalista com a história de Dark Souls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
