@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1c1208" />
+      <stop offset="100%" stop-color="#08080a" />
+    </radialGradient>
+
+    <!-- Ring Outer Glow -->
+    <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur1" />
+      <feGaussianBlur stdDeviation="8" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Gradient for the Ring structure -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fce4a6" />
+      <stop offset="35%" stop-color="#e8942b" />
+      <stop offset="70%" stop-color="#bf4b28" />
+      <stop offset="100%" stop-color="#ff7700" />
+    </linearGradient>
+
+    <radialGradient id="innerEmber" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff9900" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#b83800" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Dark Background Circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#bgGlow)" />
+
+  <!-- Soft Ember Halo in Center -->
+  <circle cx="50" cy="50" r="32" fill="url(#innerEmber)" />
+
+  <!-- Outer Burning Ring ("UM ANEL" / Ring of Cinder) -->
+  <circle
+    cx="50"
+    cy="50"
+    r="28"
+    fill="none"
+    stroke="url(#ringGrad)"
+    stroke-width="7"
+    filter="url(#ringGlow)"
+    stroke-linecap="round"
+  />
+
+  <!-- Subtle Inner Ring Accent -->
+  <circle
+    cx="50"
+    cy="50"
+    r="24.5"
+    fill="none"
+    stroke="#fff0c2"
+    stroke-width="1.2"
+    opacity="0.9"
+  />
+
+  <!-- Dark Eclipse Center -->
+  <circle cx="50" cy="50" r="21" fill="#060608" />
+
+  <!-- Corona Ember Dots around the ring -->
+  <circle cx="21" cy="45" r="1.5" fill="#fce4a6" opacity="0.9" />
+  <circle cx="78" cy="35" r="2" fill="#ff7700" opacity="0.8" />
+  <circle cx="68" cy="76" r="1.2" fill="#ffaa33" opacity="0.85" />
+  <circle cx="30" cy="70" r="1.8" fill="#e8942b" opacity="0.9" />
+</svg>

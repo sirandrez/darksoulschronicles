@@ -1,3 +1,5 @@
+export type Language = 'pt' | 'en';
+
 export type EraKey = 'era_antiga' | 'ds1' | 'ds2' | 'ds3';
 
 export interface EraInfo {

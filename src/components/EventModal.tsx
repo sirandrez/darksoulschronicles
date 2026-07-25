@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { TimelineEvent } from '../types';
-import { ERAS_CONFIG } from '../data/initialEvents';
+import { Language, TimelineEvent } from '../types';
+import { getErasConfig } from '../data/initialEvents';
 import { X, MapPin, Users, Quote, ChevronLeft, ChevronRight, Maximize2, Sparkles } from 'lucide-react';
 
 interface EventModalProps {
@@ -10,6 +10,7 @@ interface EventModalProps {
   onNavigate: (direction: 'prev' | 'next') => void;
   hasPrev: boolean;
   hasNext: boolean;
+  language: Language;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -18,12 +19,20 @@ export const EventModal: React.FC<EventModalProps> = ({
   onNavigate,
   hasPrev,
   hasNext,
+  language,
 }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
+  const [imgError, setImgError] = useState<boolean>(false);
+
+  // Reset img error when event changes
+  React.useEffect(() => {
+    setImgError(false);
+  }, [event?.id]);
 
   if (!event) return null;
 
-  const eraInfo = ERAS_CONFIG[event.era];
+  const erasConfig = getErasConfig(language);
+  const eraInfo = erasConfig[event.era] || erasConfig['era_antiga'];
 
   return (
     <AnimatePresence>
@@ -63,7 +72,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               <button
                 onClick={onClose}
                 className="p-1.5 rounded text-[#a39e8f] hover:text-[#f3e3a9] hover:bg-[#201d16] transition"
-                title="Fechar (Esc)"
+                title={language === 'pt' ? 'Fechar (Esc)' : 'Close (Esc)'}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -91,27 +100,39 @@ export const EventModal: React.FC<EventModalProps> = ({
             {/* Image Banner Display (if available) */}
             {event.imageUrl && (
               <div className="relative group overflow-hidden rounded border border-[#2a2720] bg-[#050507]">
-                <img
-                  src={event.imageUrl}
-                  alt={event.title}
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  className="w-full max-h-96 object-cover transition-transform duration-700 group-hover:scale-102"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c10] via-transparent to-transparent opacity-80" />
+                {!imgError ? (
+                  <img
+                    src={event.imageUrl}
+                    alt={event.title}
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    onError={() => setImgError(true)}
+                    className="w-full max-h-96 object-cover transition-transform duration-700 group-hover:scale-102"
+                  />
+                ) : (
+                  <div className="w-full h-48 sm:h-64 bg-gradient-to-br from-[#12131a] via-[#1a1812] to-[#0a0a0d] flex flex-col items-center justify-center p-6 text-center relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(200,136,40,0.15),transparent_70%)]" />
+                    <Sparkles className="w-8 h-8 text-[#c88828] mb-2 animate-pulse" />
+                    <h4 className="font-cinzel text-lg text-[#f3e3a9] font-bold z-10">{event.title}</h4>
+                    <p className="font-cormorant italic text-sm text-[#8e8777] mt-1 z-10">{event.eraLabel}</p>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c10] via-transparent to-transparent opacity-80 pointer-events-none" />
                 
                 {/* Lightbox Trigger */}
-                <button
-                  onClick={() => setIsLightboxOpen(true)}
-                  className="absolute bottom-3 right-3 p-2 rounded bg-[#0b0c10]/80 border border-[#4a4234] text-[#d8d0bd] hover:text-[#f3e3a9] hover:border-[#c88828] transition backdrop-blur text-xs flex items-center gap-1.5"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Ampliar Imagem</span>
-                </button>
+                {!imgError && (
+                  <button
+                    onClick={() => setIsLightboxOpen(true)}
+                    className="absolute bottom-3 right-3 p-2 rounded bg-[#0b0c10]/80 border border-[#4a4234] text-[#d8d0bd] hover:text-[#f3e3a9] hover:border-[#c88828] transition backdrop-blur text-xs flex items-center gap-1.5 z-10"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>{language === 'pt' ? 'Ampliar Imagem' : 'Enlarge Image'}</span>
+                  </button>
+                )}
 
                 {event.imageCaption && (
-                  <p className="absolute bottom-3 left-3 right-16 text-xs font-cormorant italic text-[#d2c9b2] drop-shadow-md">
+                  <p className="absolute bottom-3 left-3 right-32 text-xs font-cormorant italic text-[#d2c9b2] drop-shadow-md z-10">
                     {event.imageCaption}
                   </p>
                 )}
@@ -134,7 +155,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             {/* Full Lore Text */}
             <div className="space-y-3 border-t border-[#1f1d18] pt-5">
               <h3 className="font-cinzel text-xs text-[#8e8777] tracking-widest uppercase">
-                Crônica de História
+                {language === 'pt' ? 'Crônica de História' : 'Lore Chronicle'}
               </h3>
               <p className="font-cormorant text-base sm:text-lg text-[#d0c8b4] leading-relaxed whitespace-pre-line">
                 {event.fullLore}
@@ -148,7 +169,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <MapPin className="w-4 h-4 text-[#c88828] mt-0.5 shrink-0" />
                   <div>
                     <span className="block text-[10px] font-cinzel text-[#8e8777] uppercase tracking-wider">
-                      Localização Principal
+                      {language === 'pt' ? 'Localização Principal' : 'Main Location'}
                     </span>
                     <span className="font-cormorant text-sm text-[#f0e6cf]">
                       {event.location}
@@ -162,7 +183,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <Users className="w-4 h-4 text-[#c88828] mt-0.5 shrink-0" />
                   <div>
                     <span className="block text-[10px] font-cinzel text-[#8e8777] uppercase tracking-wider">
-                      Personagens e Figuras Chave
+                      {language === 'pt' ? 'Personagens e Figuras Chave' : 'Key Characters & Figures'}
                     </span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {event.characters.map((char, i) => (
@@ -192,7 +213,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               }`}
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Anterior</span>
+              <span>{language === 'pt' ? 'Anterior' : 'Previous'}</span>
             </button>
 
             <span className="text-xs font-cinzel text-[#706b5f]">darksoulsChronicle</span>
@@ -206,7 +227,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   : 'opacity-40 cursor-not-allowed border-transparent text-[#5c584e]'
               }`}
             >
-              <span>Próximo</span>
+              <span>{language === 'pt' ? 'Próximo' : 'Next'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

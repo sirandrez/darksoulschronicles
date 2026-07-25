@@ -1,25 +1,29 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { TimelineEvent } from '../types';
-import { ERAS_CONFIG } from '../data/initialEvents';
+import { Language, TimelineEvent } from '../types';
+import { getErasConfig } from '../data/initialEvents';
 import { ChevronLeft, ChevronRight, Sparkles, MapPin } from 'lucide-react';
 
 interface TimelineAxisProps {
   events: TimelineEvent[];
   selectedEvent: TimelineEvent | null;
   onSelectEvent: (event: TimelineEvent) => void;
+  language: Language;
 }
 
 export const TimelineAxis: React.FC<TimelineAxisProps> = ({
   events,
   selectedEvent,
   onSelectEvent,
+  language,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<TimelineEvent | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [startX, setStartX] = useState<number>(0);
   const [scrollLeft, setScrollLeft] = useState<number>(0);
+
+  const erasConfig = getErasConfig(language);
 
   // Always display all events chronologically sorted
   const sortedEvents = [...events].sort((a, b) => a.yearOrOrder - b.yearOrOrder);
@@ -56,28 +60,30 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
   const handleScrollBy = (direction: 'left' | 'right') => {
     if (!containerRef.current) return;
-    const amount = direction === 'left' ? -350 : 350;
+    const amount = direction === 'left' ? -400 : 400;
     containerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
   };
 
   return (
-    <div className="w-full relative flex flex-col items-center select-none py-8 md:py-16">
+    <div className="w-full relative flex flex-col items-center select-none py-6 sm:py-12">
       {/* HORIZONTAL TIMELINE VIEW */}
-      <div className="w-full relative my-4 md:my-8 py-6 px-4">
+      <div className="w-full relative my-2 md:my-6 py-4 px-2 sm:px-6">
         {/* Scroll Control Arrows */}
         <button
           onClick={() => handleScrollBy('left')}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-[#121318]/90 border border-[#3a352a] text-[#c2bda8] hover:text-[#f3e3a9] hover:border-[#c88828] hover:bg-[#201c13] transition-all shadow-lg backdrop-blur"
-          aria-label="Rolar para a esquerda"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-[#121318]/90 border border-[#3a352a] text-[#c2bda8] hover:text-[#f3e3a9] hover:border-[#c88828] hover:bg-[#201c13] transition-all shadow-xl backdrop-blur"
+          aria-label={language === 'pt' ? 'Rolar para a esquerda' : 'Scroll left'}
+          title={language === 'pt' ? 'Rolar para a esquerda' : 'Scroll left'}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={() => handleScrollBy('right')}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-[#121318]/90 border border-[#3a352a] text-[#c2bda8] hover:text-[#f3e3a9] hover:border-[#c88828] hover:bg-[#201c13] transition-all shadow-lg backdrop-blur"
-          aria-label="Rolar para a direita"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-[#121318]/90 border border-[#3a352a] text-[#c2bda8] hover:text-[#f3e3a9] hover:border-[#c88828] hover:bg-[#201c13] transition-all shadow-xl backdrop-blur"
+          aria-label={language === 'pt' ? 'Rolar para a direita' : 'Scroll right'}
+          title={language === 'pt' ? 'Rolar para a direita' : 'Scroll right'}
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Drag scrollable container */}
@@ -87,42 +93,44 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
           onMouseLeave={handleMouseLeaveOrUp}
           onMouseUp={handleMouseLeaveOrUp}
           onMouseMove={handleMouseMove}
-          className={`w-full overflow-x-auto py-36 sm:py-44 px-16 sm:px-32 no-scrollbar cursor-grab active:cursor-grabbing scroll-smooth relative ${
+          className={`w-full overflow-x-auto py-32 sm:py-40 px-6 sm:px-12 no-scrollbar cursor-grab active:cursor-grabbing scroll-smooth relative ${
             isDragging ? 'scroll-auto' : ''
           }`}
         >
-          {/* The Main Horizontal Axis Line */}
-          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#4a3e2a] to-transparent -translate-y-1/2 z-0">
-            <div className="w-full h-full bg-gradient-to-r from-transparent via-[#c88828]/50 to-transparent animate-slow-glow" />
-          </div>
+          {/* Wrapper spanning full content width so the line reaches all points */}
+          <div className="relative inline-flex items-center min-w-full py-12 px-20 sm:px-32">
+            {/* The Main Horizontal Axis Line spanning across all points */}
+            <div className="absolute top-1/2 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#c88828] to-transparent -translate-y-1/2 z-0 shadow-[0_0_12px_rgba(200,136,40,0.6)]">
+              <div className="w-full h-full bg-gradient-to-r from-[#201a10] via-[#f5d08b] to-[#201a10] opacity-80 animate-slow-glow" />
+            </div>
 
-          {/* Timeline Nodes Container */}
-          <div className="flex items-center gap-28 sm:gap-40 min-w-max relative z-10 py-10 px-12">
+            {/* Timeline Nodes Container */}
+            <div className="flex items-center gap-64 sm:gap-80 md:gap-96 min-w-max relative z-10">
             {sortedEvents.map((evt, index) => {
               const isSelected = selectedEvent?.id === evt.id;
               const isHovered = hoveredEvent?.id === evt.id;
               const isMajor = evt.importance === 'pivotal' || evt.importance === 'major';
-              const eraInfo = ERAS_CONFIG[evt.era];
+              const eraInfo = erasConfig[evt.era] || erasConfig['era_antiga'];
               const isEven = index % 2 === 0;
 
               return (
                 <div
                   key={evt.id}
                   id={`event-node-${evt.id}`}
-                  className="relative flex flex-col items-center group cursor-pointer"
+                  className="relative flex items-center justify-center group cursor-pointer w-8 h-8"
                   onClick={() => onSelectEvent(evt)}
                   onMouseEnter={() => setHoveredEvent(evt)}
                   onMouseLeave={() => setHoveredEvent(null)}
                 >
                   {/* Era Tag Indicator above/below */}
                   <div
-                    className={`absolute whitespace-nowrap text-[10px] font-optimus tracking-widest uppercase transition-all duration-300 ${
-                      isEven ? '-top-16' : 'top-16'
+                    className={`absolute whitespace-nowrap text-[10px] font-optimus tracking-widest uppercase transition-all duration-300 left-1/2 -translate-x-1/2 pointer-events-none ${
+                      isEven ? '-top-12' : 'top-12'
                     } ${
                       isSelected || isHovered ? 'text-[#f5d08b] scale-105' : 'text-[#7e786b]'
                     }`}
                   >
-                    <span className="flex items-center gap-1 bg-[#0c0d12]/90 px-2.5 py-1 rounded border border-[#23211a]">
+                    <span className="flex items-center gap-1 bg-[#0c0d12]/95 px-2.5 py-1 rounded border border-[#23211a] shadow-md">
                       <span
                         className="w-1.5 h-1.5 rounded-full inline-block"
                         style={{ backgroundColor: eraInfo.themeColor }}
@@ -173,16 +181,16 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
                     </div>
                   </motion.div>
 
-                  {/* Title Banner below/above point */}
+                  {/* Title Banner (Well spaced, centered, wrapping cleanly without overlapping neighboring points) */}
                   <div
-                    className={`absolute whitespace-nowrap text-center transition-all duration-300 max-w-[220px] ${
-                      isEven ? 'top-11' : '-top-24'
+                    className={`absolute text-center flex flex-col items-center justify-center transition-all duration-300 w-56 sm:w-64 max-w-[260px] left-1/2 -translate-x-1/2 pointer-events-none ${
+                      isEven ? 'top-12' : 'bottom-12'
                     }`}
                   >
                     <h4
-                      className={`font-optimus text-xs sm:text-sm font-semibold tracking-wide transition-colors ${
+                      className={`font-optimus text-xs sm:text-sm font-semibold tracking-wide transition-colors whitespace-normal break-words leading-tight px-1 ${
                         isSelected
-                          ? 'text-[#f5e4bc] drop-shadow-[0_0_8px_rgba(200,136,40,0.5)]'
+                          ? 'text-[#f5e4bc] drop-shadow-[0_0_8px_rgba(200,136,40,0.6)] font-bold'
                           : isHovered
                           ? 'text-[#dfcb9a]'
                           : 'text-[#a39c89]'
@@ -190,7 +198,7 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
                     >
                       {evt.title}
                     </h4>
-                    <p className="text-[10px] text-[#706b5f] font-cormorant italic truncate mt-0.5">
+                    <p className="text-[10px] text-[#706b5f] font-cormorant italic truncate mt-1">
                       {evt.timePeriodDisplay}
                     </p>
                   </div>
@@ -202,8 +210,8 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
                         initial={{ opacity: 0, y: isEven ? 10 : -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className={`absolute z-40 w-64 p-3.5 rounded bg-[#0f1015]/95 border border-[#3d372e] shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md pointer-events-none ${
-                          isEven ? 'top-24' : 'bottom-24'
+                        className={`absolute z-40 w-64 p-3.5 rounded bg-[#0f1015]/95 border border-[#3d372e] shadow-[0_10px_30px_rgba(0,0,0,0.85)] backdrop-blur-md pointer-events-none left-1/2 -translate-x-1/2 ${
+                          isEven ? 'top-28' : 'bottom-28'
                         }`}
                       >
                         <div className="flex items-center justify-between text-[10px] text-[#c88828] font-optimus mb-1">
@@ -228,6 +236,7 @@ export const TimelineAxis: React.FC<TimelineAxisProps> = ({
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
